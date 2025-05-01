@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rent Estimator - Multi Currency</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h2 {
+      font-family: 'Cinzel', serif;
+      color: #f7e883;
+      text-align: center;
+      margin-top: 40px;
+    }
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #f7e883;
+      padding: 12px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background-color: #000;
+      color: #f7e883;
+    }
+    td {
+      background-color: #000;
+    }
+    input, select {
+      background: #111;
+      color: #fff;
+      border: 1px solid #f7e883;
+      padding: 4px;
+      width: 100px;
+      font-size: 14px;
+      text-align: center;
+    }
+    .calculate-btn {
+      background-color: #f7e883;
+      color: #000;
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      padding: 10px 20px;
+      border: none;
+      margin: 20px auto;
+      display: block;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🛥️ Rent Estimator – Multi-Currency (Product Price: 10m DKK)</h2>
+
+<div style="text-align:center">
+  <label for="currency">Currency:</label>
+  <select id="currency" onchange="calculateRent()">
+    <option value="1" selected>DKK</option>
+    <option value="0.14">USD</option>
+    <option value="0.13">EUR</option>
+  </select>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Monthly Visitors</th>
+      <th>Conversion %</th>
+      <th>Product Price</th>
+      <th>Estimated Buyers</th>
+      <th>Monthly Sales</th>
+      <th>Trial Rent (1%)</th>
+      <th>Yearly Sales</th>
+      <th>True Monthly Rent (5%)</th>
+      <th>True Yearly Rent</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><input type="number" id="visitors" value="6000"></td>
+      <td><input type="number" id="conversion" value="0.2" step="0.1"></td>
+      <td><input type="number" id="price" value="10000000"></td>
+      <td id="buyers">-</td>
+      <td id="monthly-sale">-</td>
+      <td id="trial-rent">-</td>
+      <td id="yearly-sale">-</td>
+      <td id="monthly-rent">-</td>
+      <td id="yearly-rent">-</td>
+    </tr>
+  </tbody>
+</table>
+<button class="calculate-btn" onclick="calculateRent()">CALCULATE NOW</button>
+
+<script>
+function formatCurrency(value, rate) {
+  const converted = value * rate;
+  if (converted >= 1e9) return (converted / 1e9).toFixed(2) + "b";
+  if (converted >= 1e6) return (converted / 1e6).toFixed(1) + "m";
+  if (converted >= 1e3) return (converted / 1e3).toFixed(1) + "k";
+  return converted.toFixed(0);
+}
+
+function calculateRent() {
+  const visitors = parseFloat(document.getElementById("visitors").value) || 0;
+  const conversion = parseFloat(document.getElementById("conversion").value) / 100 || 0;
+  const price = parseFloat(document.getElementById("price").value) || 0;
+  const rate = parseFloat(document.getElementById("currency").value) || 1;
+
+  const buyers = Math.floor(visitors * conversion);
+  const monthlySale = buyers * price;
+  const yearlySale = monthlySale * 12;
+  const trialRent = monthlySale * 0.01;
+  const yearlyRent = yearlySale * 0.05;
+  const monthlyRent = yearlyRent / 12;
+
+  document.getElementById("buyers").textContent = buyers;
+  document.getElementById("monthly-sale").textContent = formatCurrency(monthlySale, rate);
+  document.getElementById("trial-rent").textContent = formatCurrency(trialRent, rate);
+  document.getElementById("yearly-sale").textContent = formatCurrency(yearlySale, rate);
+  document.getElementById("yearly-rent").textContent = formatCurrency(yearlyRent, rate);
+  document.getElementById("monthly-rent").textContent = formatCurrency(monthlyRent, rate);
+}
+</script>
+
+</body>
+</html>
