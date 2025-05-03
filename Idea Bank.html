@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <title>IDEA BANK</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: monospace;
+      padding: 40px;
+    }
+    h1 {
+      color: #f7e883;
+      font-size: 28px;
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      max-width: 500px;
+      margin: 20px auto;
+      gap: 10px;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #f7e883;
+    }
+    button {
+      background: #f7e883;
+      color: #000;
+      cursor: pointer;
+    }
+    .entry {
+      border-bottom: 1px solid #333;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .tag {
+      color: #f7e883;
+      font-size: 14px;
+    }
+    .controls {
+      margin-top: 5px;
+    }
+    .controls button {
+      font-size: 12px;
+      margin-right: 10px;
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+    }
+    .search {
+      max-width: 500px;
+      margin: 20px auto;
+      display: flex;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🧠 IDEA BANK</h1>
+
+<form id="ideaForm">
+  <input type="text" id="ideaInput" placeholder="Your idea or line..." required>
+  <input type="text" id="tagInput" placeholder="Tag (e.g. poetry, absurd, punchline)">
+  <button type="submit">Save</button>
+</form>
+
+<div class="search">
+  <input type="text" id="searchInput" placeholder="Search ideas...">
+  <input type="text" id="filterTag" placeholder="Filter by tag">
+</div>
+
+<div id="ideaList"></div>
+
+<script>
+  const form = document.getElementById('ideaForm');
+  const ideaInput = document.getElementById('ideaInput');
+  const tagInput = document.getElementById('tagInput');
+  const ideaList = document.getElementById('ideaList');
+  const searchInput = document.getElementById('searchInput');
+  const filterTag = document.getElementById('filterTag');
+
+  function loadIdeas() {
+    const ideas = JSON.parse(localStorage.getItem('ideaBank') || '[]');
+    ideaList.innerHTML = '';
+    ideas.forEach((item, index) => {
+      if ((searchInput.value && !item.text.toLowerCase().includes(searchInput.value.toLowerCase())) ||
+          (filterTag.value && item.tag.toLowerCase() !== filterTag.value.toLowerCase())) return;
+      const entry = document.createElement('div');
+      entry.className = 'entry';
+      entry.innerHTML = `
+        <div>${item.text}</div>
+        <div class="tag">#${item.tag}</div>
+        <div class="controls">
+          <button onclick="copyIdea(${index})">Copy</button>
+          <button onclick="deleteIdea(${index})">Delete</button>
+        </div>
+      `;
+      ideaList.appendChild(entry);
+    });
+  }
+
+  form.onsubmit = e => {
+    e.preventDefault();
+    const ideas = JSON.parse(localStorage.getItem('ideaBank') || '[]');
+    ideas.unshift({ text: ideaInput.value, tag: tagInput.value || 'untagged' });
+    localStorage.setItem('ideaBank', JSON.stringify(ideas));
+    ideaInput.value = '';
+    tagInput.value = '';
+    loadIdeas();
+  };
+
+  function copyIdea(index) {
+    const ideas = JSON.parse(localStorage.getItem('ideaBank') || '[]');
+    navigator.clipboard.writeText(ideas[index].text);
+    alert('Copied!');
+  }
+
+  function deleteIdea(index) {
+    const ideas = JSON.parse(localStorage.getItem('ideaBank') || '[]');
+    ideas.splice(index, 1);
+    localStorage.setItem('ideaBank', JSON.stringify(ideas));
+    loadIdeas();
+  }
+
+  searchInput.oninput = loadIdeas;
+  filterTag.oninput = loadIdeas;
+
+  loadIdeas();
+</script>
+
+</body>
+</html>
